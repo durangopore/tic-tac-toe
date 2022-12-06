@@ -25,10 +25,9 @@ source-repository head
 
 library
   exposed-modules:
-      Behavior
       Lib
-      Model
-      Model.Internal
+      TicTacToe
+      TicTacToe.Internal
   other-modules:
       Paths_tic_tac_toe
   hs-source-dirs:
@@ -55,7 +54,7 @@ test-suite tic-tac-toe-test
   type: exitcode-stdio-1.0
   main-is: Spec.hs
   other-modules:
-      BehaviorSpec
+      TicTacToeSpec
       Paths_tic_tac_toe
   hs-source-dirs:
       test

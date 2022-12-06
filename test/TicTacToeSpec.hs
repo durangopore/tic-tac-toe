@@ -1,6 +1,6 @@
-module BehaviorSpec (
-  spec,
-  ) where
+module TicTacToeSpec (
+  spec
+) where
 
 import Data.Either
 
@@ -8,9 +8,8 @@ import Test.Hspec
 import Test.Hspec.QuickCheck
 import Test.QuickCheck
 
-import Behavior
-import Model
-import Model.Internal
+import TicTacToe
+import TicTacToe.Internal
 
 spec :: Spec
 spec = do
@@ -18,9 +17,9 @@ spec = do
 
 testExecuteMove :: Spec
 testExecuteMove = do
-  describe "executeMove" $ do
+  describe "playMove" $ do
     prop "sets an arbitrary cell on an empty board if in range" $
-       \(AnyMove move) size -> (executeMove move (newBoard size)
+       \(AnyMove move) size -> (playMove (newBoard size) move
                        `shouldSatisfy`
                        case move of
                          (Move s p@(Position row col)) | row < size && col < size -> fromRight False . fmap (isSet s p)
