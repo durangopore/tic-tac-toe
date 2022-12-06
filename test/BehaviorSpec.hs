@@ -23,11 +23,10 @@ testExecuteMove = do
        \(AnyMove move) size -> (executeMove move (newBoard size)
                        `shouldSatisfy`
                        case move of
-                         (Move s p@(Position row col)) | row < size && col < size -> f s p
+                         (Move s p@(Position row col)) | row < size && col < size -> fromRight False . fmap (isSet s p)
                          _ -> isLeft)
       where
-        f s p (Right b) = getCell b p == Just (Just s)
-        f _ _ _ = False
+        isSet s p b = getCell b p == Just (Just s)
 
 newtype AnyMove = AnyMove Move deriving (Show)
 
