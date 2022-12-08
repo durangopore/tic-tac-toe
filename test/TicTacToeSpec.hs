@@ -24,6 +24,11 @@ testExecuteMove = do
                                    `shouldSatisfy`
                                    case move of
                                      (Move s p) -> fromRight undefined . fmap (isSet s p))
+    prop "preserves size after a move is played" $
+      \(ValidMove move size) -> (fromRight undefined (playMove (newBoard size) move)
+                                  `shouldSatisfy`
+                                  \board -> case board of
+                                              (Board rows) -> length rows == size && all ((== size) . length) rows)
 
 data ValidMove = ValidMove Move Int deriving (Show)
 
