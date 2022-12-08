@@ -19,21 +19,19 @@ testExecuteMove :: Spec
 testExecuteMove = do
   describe "playMove" $ do
     prop "sets an arbitrary cell on an empty board if in range" $
-       \(AnyMove move) size -> (playMove (newBoard size) move
-                       `shouldSatisfy`
-                       case move of
-                         (Move s p@(Position row col)) | row < size && col < size -> fromRight False . fmap (isSet s p)
-                         _ -> isLeft)
-      where
-        isSet s p b = getCell b p == Just (Just s)
+       \(ValidMove move size) -> (let isSet s p b = getCell b p == Just (Just s) in
+                                    playMove (newBoard size) move
+                                   `shouldSatisfy`
+                                   case move of
+                                     (Move s p) -> fromRight undefined . fmap (isSet s p))
 
-newtype AnyMove = AnyMove Move deriving (Show)
+data ValidMove = ValidMove Move Int deriving (Show)
 
-instance Arbitrary AnyMove where
+instance Arbitrary ValidMove where
   arbitrary = do
-    AnySymbol s <- arbitrary
-    AnyPosition p <- arbitrary
-    return (AnyMove $ Move s p)
+    ValidPosition position size <- arbitrary
+    AnySymbol symbol <- arbitrary
+    return (ValidMove (Move symbol position) size)
 
 newtype AnySymbol = AnySymbol Symbol deriving (Show)
 
@@ -41,10 +39,11 @@ instance Arbitrary AnySymbol where
   arbitrary = do
     elements $ map AnySymbol [Cross, Knot]
 
-newtype AnyPosition = AnyPosition Position deriving (Show)
+data ValidPosition = ValidPosition Position Int deriving (Show)
 
-instance Arbitrary AnyPosition where
+instance Arbitrary ValidPosition where
   arbitrary = do
-    Positive row <- arbitrary
-    Positive col <- arbitrary
-    return (AnyPosition $ Position row col)
+    size <- chooseInt (2, 4)
+    row <- chooseInt (0, size - 1)
+    col <- chooseInt (0, size - 1)
+    return (ValidPosition (Position row col) size)
