@@ -8,8 +8,12 @@ data Symbol = Cross | Knot deriving (Eq, Show)
 
 newtype Board = Board [[Maybe Symbol]] deriving (Show)
 
-newBoard :: Int -> Board
-newBoard size = Board (replicate size (replicate size Nothing))
+data Error = InvalidPosition | InvalidSize deriving (Show)
+
+newBoard :: Int -> Either Error Board
+newBoard size
+  | size >= 2 = Right . Board $ replicate size (replicate size Nothing)
+  | otherwise = Left InvalidSize
 
 data Position = Position Int Int deriving (Show)
 

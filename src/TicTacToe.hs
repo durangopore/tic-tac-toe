@@ -14,9 +14,7 @@ data Player = One | Two
 
 data Move = Move Symbol Position deriving (Show)
 
-data Error = InvalidMove deriving (Show)
-
 playMove :: Board -> Move -> Either Error Board
 playMove b (Move s p)
   | valid p b = Right (setCell s p b)
-  | otherwise = Left InvalidMove
+  | otherwise = Left InvalidPosition

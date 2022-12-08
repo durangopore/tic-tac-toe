@@ -20,15 +20,17 @@ testExecuteMove = do
   describe "playMove" $ do
     prop "sets an arbitrary cell on an empty board if in range" $
       \(ValidMove move size) -> let isSet s p b = getCell b p == Just (Just s) in
-                                  fromRight undefined (playMove (newBoard size) move)
+                                  fromRight undefined (playMove (newBoard' size) move)
                                   `shouldSatisfy`
                                   case move of
                                     (Move s p) -> isSet s p
     prop "preserves size after a move is played" $
-      \(ValidMove move size) -> fromRight undefined (playMove (newBoard size) move)
+      \(ValidMove move size) -> fromRight undefined (playMove (newBoard' size) move)
                                 `shouldSatisfy`
                                 \board -> case board of
                                             (Board rows) -> length rows == size && all ((== size) . length) rows
+  where
+    newBoard' = fromRight undefined . newBoard
 
 data ValidMove = ValidMove Move Int deriving (Show)
 
