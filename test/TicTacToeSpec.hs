@@ -48,7 +48,7 @@ data ValidPosition = ValidPosition Position Int deriving (Show)
 
 instance Arbitrary ValidPosition where
   arbitrary = do
-    size <- chooseInt (2, 4)
+    size <- arbitrary `suchThat` (> 2)
     row <- chooseInt (0, size - 1)
     col <- chooseInt (0, size - 1)
     return (ValidPosition (Position row col) size)
