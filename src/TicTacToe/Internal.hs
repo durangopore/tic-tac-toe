@@ -27,7 +27,7 @@ setCell s (Position r c) (Board b) = Board (setElem newRow r b)
     newRow = setElem (Just s) c (b !! r)
 
 setElem :: a -> Int -> [a] -> [a]
-setElem a i as = take i as ++ (a : (drop i as))
+setElem a i as = take i as ++ (a : (drop (i + 1) as))
 
 getElem :: Int -> [a] -> Maybe a
 getElem i as = if i < length as then Just (as !! i)
