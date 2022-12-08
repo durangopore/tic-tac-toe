@@ -36,3 +36,12 @@ getElem i as = if i < length as then Just (as !! i)
 getCell :: Board -> Position -> Maybe (Maybe Symbol)
 getCell (Board b) (Position r c) = getElem r b >>= getElem c
 
+printBoard :: Board -> IO ()
+printBoard (Board rows) = mapM_ printRow rows
+  where
+    printRow cols = do
+       putStrLn . intersperse ' ' $ map toChar cols
+    toChar s = case s of
+                 Nothing -> '_'
+                 Just Knot -> 'o'
+                 Just Cross -> 'x'
