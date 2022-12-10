@@ -14,6 +14,7 @@ import TicTacToe.Internal
 spec :: Spec
 spec = do
   testExecuteMove
+  testGameOver
 
 testExecuteMove :: Spec
 testExecuteMove = do
@@ -35,6 +36,11 @@ testExecuteMove = do
     newBoard' = fromRight undefined . newBoard
     playMove' b p = fromRight undefined $ playMove b p
 
+testGameOver :: Spec
+testGameOver = do
+  describe "gameOver" $ do
+    prop "detects when the game is over" $
+      \(GameOver board) -> board `shouldSatisfy` gameOver
 
 data ValidMove = ValidMove Move Int deriving Show
 
