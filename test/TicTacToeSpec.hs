@@ -41,13 +41,13 @@ instance Arbitrary ValidMove where
     AnySymbol symbol <- arbitrary
     return (ValidMove (Move symbol position) size)
 
-newtype AnySymbol = AnySymbol Symbol deriving (Show)
+newtype AnySymbol = AnySymbol Symbol deriving Show
 
 instance Arbitrary AnySymbol where
   arbitrary = do
     elements $ map AnySymbol [Cross, Knot]
 
-data ValidPosition = ValidPosition Position Int deriving (Show)
+data ValidPosition = ValidPosition Position Int deriving Show
 
 instance Arbitrary ValidPosition where
   arbitrary = do

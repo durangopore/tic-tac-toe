@@ -12,7 +12,7 @@ import TicTacToe.Internal
 
 data Player = One | Two
 
-data Move = Move Symbol Position deriving (Show)
+data Move = Move Symbol Position deriving Show
 
 playMove :: Board -> Move -> Either Error Board
 playMove b (Move s p)

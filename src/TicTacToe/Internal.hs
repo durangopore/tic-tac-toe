@@ -6,16 +6,16 @@ import Data.List (intersperse)
 
 data Symbol = Cross | Knot deriving (Eq, Show)
 
-newtype Board = Board [[Maybe Symbol]] deriving (Show)
+newtype Board = Board [[Maybe Symbol]] deriving Show
 
-data Error = InvalidPosition | InvalidSize deriving (Show)
+data Error = InvalidPosition | InvalidSize deriving Show
 
 newBoard :: Int -> Either Error Board
 newBoard size
   | size >= 2 = Right . Board $ replicate size (replicate size Nothing)
   | otherwise = Left InvalidSize
 
-data Position = Position Int Int deriving (Show)
+data Position = Position Int Int deriving Show
 
 valid :: Position -> Board -> Bool
 valid (Position r c) (Board b) = (r >=0 &&
