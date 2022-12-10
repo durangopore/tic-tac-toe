@@ -5,7 +5,7 @@ module TicTacToe.Internal where
 import Data.List (intersperse)
 import Data.Maybe (isJust)
 
-data Symbol = Cross | Knot deriving (Eq, Show)
+data Symbol = Cross | Nought deriving (Eq, Show)
 
 newtype Board = Board [[Maybe Symbol]] deriving Show
 
@@ -47,7 +47,7 @@ printBoard (Board rs) = mapM_ (putStrLn . p) rs
     p = intersperse ' ' . map toChar
     toChar s = case s of
                  Nothing -> '_'
-                 Just Knot -> 'o'
+                 Just Nought -> 'o'
                  Just Cross -> 'x'
 
 gameOver :: Board -> Bool

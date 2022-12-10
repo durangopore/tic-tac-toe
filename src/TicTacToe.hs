@@ -24,5 +24,5 @@ playMove b (Move s p)
 
 parseSymbol :: String -> Either String Symbol
 parseSymbol "x" = Right Cross
-parseSymbol "o" = Right Knot
+parseSymbol "o" = Right Nought
 parseSymbol s = Left (s ++ " is not a symbol")

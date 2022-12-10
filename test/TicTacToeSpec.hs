@@ -54,7 +54,7 @@ newtype AnySymbol = AnySymbol Symbol deriving Show
 
 instance Arbitrary AnySymbol where
   arbitrary = do
-    elements $ map AnySymbol [Cross, Knot]
+    elements $ map AnySymbol [Cross, Nought]
 
 data ValidPosition = ValidPosition Position Int deriving Show
 
@@ -90,8 +90,8 @@ instance Arbitrary GameOver where
         where
           f (i, r) = setElem (Just symbol) i r
       randomBoard size = do
-        board <- vectorOf size . vectorOf size . elements $ [Nothing, Just Knot, Just Cross]
+        board <- vectorOf size . vectorOf size . elements $ [Nothing, Just Nought, Just Cross]
         return (Board (board))
       fullBoard size = do
-        board <- vectorOf size . vectorOf size . elements $ [Just Knot, Just Cross]
+        board <- vectorOf size . vectorOf size . elements $ [Just Nought, Just Cross]
         return (Board (board))
