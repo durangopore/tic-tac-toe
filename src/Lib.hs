@@ -1,6 +1,5 @@
 module Lib
-    ( someFunc
+    ( module TicTacToe
     ) where
 
-someFunc :: IO ()
-someFunc = putStrLn "someFunc"
+import TicTacToe
