@@ -71,8 +71,8 @@ instance Arbitrary GameOver where
     let colBoard = setCol symbol colIndex board
     let leftDiagBoard = setLeftDiag symbol board
     let rightDiagBoard = setRightDiag symbol size board
-
-    selectedBoard <- elements [rowBoard, colBoard, leftDiagBoard, rightDiagBoard]
+    Board staleMate <- fullBoard size
+    selectedBoard <- elements [staleMate, rowBoard, colBoard, leftDiagBoard, rightDiagBoard]
     return (GameOver (Board selectedBoard))
 
     where
@@ -85,4 +85,7 @@ instance Arbitrary GameOver where
           f (i, r) = setElem (Just symbol) i r
       randomBoard size = do
         board <- vectorOf size . vectorOf size . elements $ [Nothing, Just Knot, Just Cross]
+        return (Board (board))
+      fullBoard size = do
+        board <- vectorOf size . vectorOf size . elements $ [Just Knot, Just Cross]
         return (Board (board))

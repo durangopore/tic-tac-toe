@@ -51,10 +51,11 @@ printBoard (Board rs) = mapM_ (putStrLn . p) rs
                  Just Cross -> 'x'
 
 gameOver :: Board -> Bool
-gameOver b = any allSame (rows b) ||
+gameOver b@(Board rs) = any allSame (rows b) ||
              any allSame (cols b) ||
              allSame (leftDiag b) ||
-             allSame (rightDiag b)
+             allSame (rightDiag b) ||
+             all (all isJust) rs
 
 allSame :: Eq a => [Maybe a] -> Bool
 allSame [] = True
