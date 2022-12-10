@@ -13,11 +13,11 @@ import TicTacToe.Internal
 
 spec :: Spec
 spec = do
-  testExecuteMove
+  testPlayMove
   testGameOver
 
-testExecuteMove :: Spec
-testExecuteMove = do
+testPlayMove :: Spec
+testPlayMove = do
   describe "playMove" $ do
     prop "sets an arbitrary cell on an empty board if in range" $
       \(ValidMove move size) -> let isSet s p b = getCell b p == Just (Just s) in
