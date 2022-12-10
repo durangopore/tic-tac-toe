@@ -41,10 +41,9 @@ getCell :: Board -> Position -> Maybe (Maybe Symbol)
 getCell (Board b) (Position r c) = getElem r b >>= getElem c
 
 printBoard :: Board -> IO ()
-printBoard (Board rows) = mapM_ printRow rows
+printBoard (Board rows) = mapM_ (putStrLn . p) rows
   where
-    printRow cols = do
-       putStrLn . intersperse ' ' $ map toChar cols
+    p = intersperse ' ' . map toChar
     toChar s = case s of
                  Nothing -> '_'
                  Just Knot -> 'o'
