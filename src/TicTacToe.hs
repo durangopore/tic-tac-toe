@@ -6,6 +6,7 @@ module TicTacToe (
   Position (..),
   Move (..),
   playMove,
+  gameOver,
 ) where
 
 import TicTacToe.Internal

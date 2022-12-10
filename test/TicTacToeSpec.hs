@@ -28,12 +28,15 @@ testExecuteMove = do
       \(ValidMove move size) -> playMove' (newBoard' size) move
                                 `shouldSatisfy`
                                 \board -> case board of
-                                            (Board rows) -> length rows == size && all ((== size) . length) rows
+                                            (Board rs) -> length rs == size && all ((== size) . length) rs
+    prop "preserves size after a move is played" $
+      \(GameOver board) -> board `shouldSatisfy` gameOver
   where
     newBoard' = fromRight undefined . newBoard
     playMove' b p = fromRight undefined $ playMove b p
 
-data ValidMove = ValidMove Move Int deriving (Show)
+
+data ValidMove = ValidMove Move Int deriving Show
 
 instance Arbitrary ValidMove where
   arbitrary = do
@@ -55,3 +58,31 @@ instance Arbitrary ValidPosition where
     row <- chooseInt (0, size - 1)
     col <- chooseInt (0, size - 1)
     return (ValidPosition (Position row col) size)
+
+newtype GameOver = GameOver Board deriving Show
+
+instance Arbitrary GameOver where
+  arbitrary = do
+    ValidPosition (Position rowIndex colIndex) size <- arbitrary
+    Board board <- randomBoard size
+    AnySymbol symbol <- arbitrary
+
+    let rowBoard = setElem (replicate size (Just symbol)) rowIndex board
+    let colBoard = setCol symbol colIndex board
+    let leftDiagBoard = setLeftDiag symbol board
+    let rightDiagBoard = setRightDiag symbol size board
+
+    selectedBoard <- elements [rowBoard, colBoard, leftDiagBoard, rightDiagBoard]
+    return (GameOver (Board selectedBoard))
+
+    where
+      setCol symbol colIndex  = fmap (setElem (Just symbol) colIndex)
+      setLeftDiag symbol = fmap f . zip [0..]
+        where
+          f (i, r) = setElem (Just symbol) i r
+      setRightDiag symbol size = fmap f . zip [size-1..1]
+        where
+          f (i, r) = setElem (Just symbol) i r
+      randomBoard size = do
+        board <- vectorOf size . vectorOf size . elements $ [Nothing, Just Knot, Just Cross]
+        return (Board (board))

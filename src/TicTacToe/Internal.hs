@@ -3,6 +3,7 @@
 module TicTacToe.Internal where
 
 import Data.List (intersperse)
+import Data.Maybe (isJust)
 
 data Symbol = Cross | Knot deriving (Eq, Show)
 
@@ -41,10 +42,35 @@ getCell :: Board -> Position -> Maybe (Maybe Symbol)
 getCell (Board b) (Position r c) = getElem r b >>= getElem c
 
 printBoard :: Board -> IO ()
-printBoard (Board rows) = mapM_ (putStrLn . p) rows
+printBoard (Board rs) = mapM_ (putStrLn . p) rs
   where
     p = intersperse ' ' . map toChar
     toChar s = case s of
                  Nothing -> '_'
                  Just Knot -> 'o'
                  Just Cross -> 'x'
+
+gameOver :: Board -> Bool
+gameOver b = any allSame (rows b) ||
+             any allSame (cols b) ||
+             allSame (leftDiag b) ||
+             allSame (rightDiag b)
+
+allSame :: Eq a => [Maybe a] -> Bool
+allSame [] = True
+allSame (x:xs) = isJust x && all (== x) xs
+
+rows :: Board -> [[Maybe Symbol]]
+rows (Board rs) = rs
+
+cols :: Board -> [[Maybe Symbol]]
+cols (Board rs) = f rs where
+  f ([]:_) = []
+  f xs = fmap head xs : f (fmap tail xs)
+
+leftDiag :: Board -> [Maybe Symbol]
+leftDiag (Board rs) = fmap f (zip rs [0..]) where
+  f (xs, i)  = xs !! i
+
+rightDiag :: Board -> [Maybe Symbol]
+rightDiag (Board rs) = leftDiag (Board $ fmap reverse rs)
