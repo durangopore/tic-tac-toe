@@ -2,18 +2,22 @@ module TicTacToe (
   Symbol (..),
   Board,
   newBoard,
-  Player (..),
   Position (..),
   Move (..),
   playMove,
   gameOver,
   printBoard,
   parseSymbol,
+  otherSymbol,
+  GameState (..),
 ) where
 
 import TicTacToe.Internal
 
-data Player = One | Two
+data GameState = GameState {
+  currentSymbol :: Symbol,
+  currentBoard :: Board
+  }
 
 data Move = Move Symbol Position deriving Show
 
@@ -26,3 +30,7 @@ parseSymbol :: String -> Either String Symbol
 parseSymbol "x" = Right Cross
 parseSymbol "o" = Right Nought
 parseSymbol s = Left (s ++ " is not a symbol")
+
+otherSymbol :: Symbol -> Symbol
+otherSymbol Nought = Cross
+otherSymbol Cross = Nought

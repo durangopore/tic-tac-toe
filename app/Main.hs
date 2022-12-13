@@ -6,31 +6,45 @@ import Text.Read (readEither)
 import Lib
 
 main :: IO ()
-main = gameLoop (fromRight undefined $ newBoard 3)
+main = do
+  symbol <- selectionLoop
+  let board = fromRight undefined $ newBoard 3
+  gameLoop GameState { currentBoard = board, currentSymbol = symbol }
 
-gameLoop :: Board -> IO ()
-gameLoop board = do
+selectionLoop :: IO Symbol
+selectionLoop = do
+  putStrLn "Select Player 1 symbol (x or o):"
+  input <- getLine
+  case parseSymbol input of
+    Right symbol -> return symbol
+    Left e       -> do
+      putStrLn e
+      selectionLoop
+
+gameLoop :: GameState -> IO ()
+gameLoop gameState = do
+  let board = currentBoard gameState
+  let symbol = currentSymbol gameState
   printBoard board
   if gameOver board then
     (putStrLn "Game Over")
   else do
     input <- getLine
-    case parseInput input of
-      Right move -> do
-        case playMove board move of
-          Right board' -> gameLoop board'
+    case parsePosition input of
+      Right position -> do
+        case playMove board (Move symbol position) of
+          Right board' -> gameLoop GameState { currentBoard = board', currentSymbol = otherSymbol symbol }
           Left playError -> do
             putStrLn (show playError)
-            gameLoop board
+            gameLoop gameState
       Left parseError -> do
         putStrLn parseError
-        gameLoop board
+        gameLoop gameState
 
-parseInput :: String -> Either String Move
-parseInput input = check (words input) where
-  check [s, r, c] = do
-    symbol <- parseSymbol s
+parsePosition :: String -> Either String Position
+parsePosition input = check (words input) where
+  check [r, c] = do
     row <- readEither r
     col <- readEither c
-    return (Move symbol (Position row col))
+    return (Position row col)
   check _ = Left "Bad input"
