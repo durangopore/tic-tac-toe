@@ -1,6 +1,7 @@
 module Main (main) where
 
 import Data.Either (fromRight)
+import Data.Either.Combinators (mapLeft)
 import Text.Read (readEither)
 
 import Lib
@@ -43,8 +44,8 @@ gameLoop gameState = do
 
 parsePosition :: String -> Either String Position
 parsePosition input = check (words input) where
-  check [r, c] = do
+  check [r, c] = mapLeft (const "Not an integer") $ do
     row <- readEither r
     col <- readEither c
     return (Position row col)
-  check _ = Left "Bad input"
+  check _ = Left "Too many or too few inputs"
