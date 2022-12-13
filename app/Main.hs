@@ -11,21 +11,20 @@ main = gameLoop (fromRight undefined $ newBoard 3)
 gameLoop :: Board -> IO ()
 gameLoop board = do
   printBoard board
-  (if gameOver board then
-     (putStrLn "Game Over")
-   else do
-      input <- getLine
-      case parseInput input of
-        Right move -> do
-          case playMove board move of
-            Right board' -> gameLoop board'
-            Left playError -> do
-              putStrLn (show playError)
-              gameLoop board
-        Left parseError -> do
-          putStrLn parseError
-          gameLoop board
-    )
+  if gameOver board then
+    (putStrLn "Game Over")
+  else do
+    input <- getLine
+    case parseInput input of
+      Right move -> do
+        case playMove board move of
+          Right board' -> gameLoop board'
+          Left playError -> do
+            putStrLn (show playError)
+            gameLoop board
+      Left parseError -> do
+        putStrLn parseError
+        gameLoop board
 
 parseInput :: String -> Either String Move
 parseInput input = check (words input) where
