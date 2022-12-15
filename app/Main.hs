@@ -1,16 +1,22 @@
 module Main (main) where
 
-import Data.Either (fromRight)
 import Data.Either.Combinators (mapLeft)
+import System.Environment (getArgs)
 import Text.Read (readEither)
 
 import Lib
 
 main :: IO ()
 main = do
-  symbol <- selectionLoop
-  let board = fromRight undefined $ newBoard 3
-  gameLoop GameState { currentBoard = board, currentSymbol = symbol }
+  args <- getArgs
+  case parseArgs args of
+    Right size -> do
+      case newBoard size of
+        Right board -> do
+          symbol <- selectionLoop
+          gameLoop GameState { currentBoard = board, currentSymbol = symbol }
+        Left e -> putStrLn (show e)
+    Left e -> putStrLn e
 
 selectionLoop :: IO Symbol
 selectionLoop = do
@@ -49,3 +55,7 @@ parsePosition input = check (words input) where
     col <- readEither c
     return (Position row col)
   check _ = Left "Too many or too few inputs"
+
+parseArgs :: [String] -> Either String Int
+parseArgs [arg] = mapLeft (const "Not an integer") (readEither arg)
+parseArgs _ = Left "Invalid commandline arguments"
