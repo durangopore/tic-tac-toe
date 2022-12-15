@@ -2,7 +2,7 @@
 
 module TicTacToe.Internal where
 
-import Data.List (intersperse)
+import Data.List (intersperse, intercalate)
 import Data.Maybe (isJust)
 
 data Symbol = Cross | Nought deriving (Eq, Show)
@@ -42,9 +42,12 @@ getCell :: Board -> Position -> Maybe (Maybe Symbol)
 getCell (Board b) (Position r c) = getElem r b >>= getElem c
 
 printBoard :: Board -> IO ()
-printBoard (Board rs) = mapM_ (putStrLn . p) rs
+printBoard (Board rs) = do
+  let indices = [0..length rs - 1]
+  putStrLn (intercalate " " $ map show indices)
+  mapM_ (putStrLn . p) $ zip indices rs
   where
-    p = intersperse ' ' . map toChar
+    p (i, row) = (intersperse ' ' $ map toChar row) ++ " " ++ show i
     toChar s = case s of
                  Nothing -> '_'
                  Just Nought -> 'o'
