@@ -32,12 +32,14 @@ gameLoop :: GameState -> IO ()
 gameLoop gameState = do
   let board = currentBoard gameState
   let symbol = currentSymbol gameState
+  let other = otherSymbol symbol
   let move = currentMove gameState
   putStrLn ("number of moves: " ++ show move)
   putStrLn ("current player: " ++ [symbolToChar (Just symbol)])
   printBoard board
-  if gameOver board then
-    (putStrLn "Game Over")
+  if gameOver board then do
+    putStrLn "Game Over"
+    putStrLn ("Winner is: " ++ [symbolToChar (Just other)])
   else do
     input <- getLine
     case parsePosition input of
