@@ -6,6 +6,7 @@ module TicTacToe (
   Move (..),
   playMove,
   gameOver,
+  symbolToChar,
   printBoard,
   parseSymbol,
   otherSymbol,
@@ -16,7 +17,8 @@ import TicTacToe.Internal
 
 data GameState = GameState {
   currentSymbol :: Symbol,
-  currentBoard :: Board
+  currentBoard :: Board,
+  currentMove :: Int
   }
 
 data Move = Move Symbol Position deriving Show
