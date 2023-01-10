@@ -32,6 +32,7 @@ gameLoop :: GameState -> IO ()
 gameLoop gameState = do
   let board = currentBoard gameState
   let symbol = currentSymbol gameState
+  putStrLn ("current player: " ++ [symbolToChar (Just symbol)])
   printBoard board
   if gameOver board then
     (putStrLn "Game Over")
