@@ -10,16 +10,9 @@ module TicTacToe (
   printBoard,
   parseSymbol,
   otherSymbol,
-  GameState (..),
 ) where
 
 import TicTacToe.Internal
-
-data GameState = GameState {
-  currentSymbol :: Symbol,
-  currentBoard :: Board,
-  numMoves :: Int
-  }
 
 data Move = Move Symbol Position deriving Show
 

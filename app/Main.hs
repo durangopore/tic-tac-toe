@@ -14,7 +14,7 @@ main = do
       case newBoard size of
         Right board -> do
           symbol <- selectionLoop
-          gameLoop GameState { currentBoard = board, currentSymbol = symbol, numMoves = 0 }
+          gameLoop (initGameState board symbol)
         Left e -> putStrLn (show e)
     Left e -> putStrLn e
 
@@ -32,8 +32,8 @@ gameLoop :: GameState -> IO ()
 gameLoop gameState = do
   let board = currentBoard gameState
   let symbol = currentSymbol gameState
-  let move = numMoves gameState
-  putStrLn ("number of moves: " ++ show move)
+  let moves = numMoves gameState
+  putStrLn ("number of moves: " ++ show moves)
   putStrLn ("current player: " ++ [symbolToChar (Just symbol)])
   printBoard board
   if gameOver board then
@@ -43,7 +43,7 @@ gameLoop gameState = do
     case parsePosition input of
       Right position -> do
         case playMove board (Move symbol position) of
-          Right board' -> gameLoop GameState { currentBoard = board', currentSymbol = otherSymbol symbol, numMoves = move + 1 }
+          Right board' -> gameLoop (updateGameState board' gameState)
           Left playError -> do
             putStrLn (show playError)
             gameLoop gameState
