@@ -6,6 +6,7 @@ module TicTacToe (
   Move (..),
   playMove,
   gameOver,
+  symbolToChar,
   printBoard,
   parseSymbol,
   otherSymbol,

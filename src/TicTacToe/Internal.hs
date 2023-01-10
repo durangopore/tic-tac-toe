@@ -41,17 +41,19 @@ getElem i as = if i < length as then Just (as !! i)
 getCell :: Board -> Position -> Maybe (Maybe Symbol)
 getCell (Board b) (Position r c) = getElem r b >>= getElem c
 
+symbolToChar :: Maybe Symbol -> Char
+symbolToChar s = case s of
+  Nothing -> '_'
+  Just Nought -> 'o'
+  Just Cross -> 'x'
+
 printBoard :: Board -> IO ()
 printBoard (Board rs) = do
   let indices = [0..length rs - 1]
   putStrLn (intercalate " " $ map show indices)
   mapM_ (putStrLn . p) $ zip indices rs
   where
-    p (i, row) = (intersperse ' ' $ map toChar row) ++ " " ++ show i
-    toChar s = case s of
-                 Nothing -> '_'
-                 Just Nought -> 'o'
-                 Just Cross -> 'x'
+    p (i, row) = (intersperse ' ' $ map symbolToChar row) ++ " " ++ show i
 
 gameOver :: Board -> Bool
 gameOver b@(Board rs) = any allSame (rows b) ||
