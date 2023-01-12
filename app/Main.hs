@@ -34,11 +34,11 @@ gameLoop gameState = do
   let symbol = currentSymbol gameState
   let moves = numMoves gameState
   putStrLn ("number of moves: " ++ show moves)
-  putStrLn ("current player: " ++ [symbolToChar (Just symbol)])
+  putStrLn ("current player: " ++ [symbolToChar symbol])
   printBoard board
   case gameOver board of
     Left (Just s) -> do
-      putStrLn ("Game Over, " ++ [symbolToChar (Just s)] ++ " wins!")
+      putStrLn ("Game Over, " ++ [symbolToChar s] ++ " wins!")
     Left Nothing -> do
       putStrLn "Game Over, it's a draw!"
     Right () -> do

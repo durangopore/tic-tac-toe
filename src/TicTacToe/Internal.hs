@@ -41,11 +41,9 @@ getElem i as = if i < length as then Just (as !! i)
 getCell :: Board -> Position -> Maybe (Maybe Symbol)
 getCell (Board b) (Position r c) = getElem r b >>= getElem c
 
-symbolToChar :: Maybe Symbol -> Char
-symbolToChar s = case s of
-  Nothing -> '_'
-  Just Nought -> 'o'
-  Just Cross -> 'x'
+symbolToChar :: Symbol -> Char
+symbolToChar Nought = 'o'
+symbolToChar Cross = 'x'
 
 printBoard :: Board -> IO ()
 printBoard (Board rs) = do
@@ -53,7 +51,7 @@ printBoard (Board rs) = do
   putStrLn (intercalate " " $ map show indices)
   mapM_ (putStrLn . p) $ zip indices rs
   where
-    p (i, row) = (intersperse ' ' $ map symbolToChar row) ++ " " ++ show i
+    p (i, row) = (intersperse ' ' $ map (maybe '_' symbolToChar) row) ++ " " ++ show i
 
 gameOver :: Board -> Either (Maybe Symbol) ()
 gameOver b@(Board rs) = foldAllSame (rows b) >>
