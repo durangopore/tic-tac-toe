@@ -49,9 +49,9 @@ printBoard :: Board -> IO ()
 printBoard (Board rs) = do
   let indices = [0..length rs - 1]
   putStrLn (intercalate " " $ map show indices)
-  mapM_ (putStrLn . p) $ zip indices rs
+  mapM_ (putStrLn . printRow) $ zip indices rs
   where
-    p (i, row) = (intersperse ' ' $ map (maybe '_' symbolToChar) row) ++ " " ++ show i
+    printRow (i, row) = (intersperse ' ' $ map (maybe '_' symbolToChar) row) ++ " " ++ show i
 
 gameOver :: Board -> Either (Maybe Symbol) ()
 gameOver b@(Board rs) = foldAllSame (rows b) >>
