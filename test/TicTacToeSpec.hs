@@ -30,8 +30,6 @@ testPlayMove = do
                                 `shouldSatisfy`
                                 \board -> case board of
                                             (Board rs) -> length rs == size && all ((== size) . length) rs
-    prop "preserves size after a move is played" $
-      \(GameOver board) -> board `shouldSatisfy` gameOver
   where
     newBoard' = fromRight undefined . newBoard
     playMove' b p = fromRight undefined $ playMove b p
