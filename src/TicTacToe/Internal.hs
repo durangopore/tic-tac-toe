@@ -55,16 +55,19 @@ printBoard (Board rs) = do
   where
     p (i, row) = (intersperse ' ' $ map symbolToChar row) ++ " " ++ show i
 
-gameOver :: Board -> Bool
-gameOver b@(Board rs) = any allSame (rows b) ||
-             any allSame (cols b) ||
-             allSame (leftDiag b) ||
-             allSame (rightDiag b) ||
-             all (all isJust) rs
+gameOver :: Board -> Either (Maybe Symbol) ()
+gameOver b@(Board rs) = foldAllSame (rows b) >>
+                        foldAllSame (cols b) >>
+                        allSame (leftDiag b) >>
+                        allSame (rightDiag b) >>
+                        if all (all isJust) rs then Left Nothing else Right ()
 
-allSame :: Eq a => [Maybe a] -> Bool
-allSame [] = True
-allSame (x:xs) = isJust x && all (== x) xs
+foldAllSame :: Eq a => [[Maybe a]] -> Either (Maybe a) ()
+foldAllSame = foldr (\x y -> allSame x >> y) (Right ())
+
+allSame :: Eq a => [Maybe a] -> Either (Maybe a) ()
+allSame [] = Left Nothing
+allSame (x:xs) = if (isJust x) && all (== x) xs then Left x else Right ()
 
 rows :: Board -> [[Maybe Symbol]]
 rows (Board rs) = rs

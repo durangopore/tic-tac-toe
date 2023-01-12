@@ -36,20 +36,23 @@ gameLoop gameState = do
   putStrLn ("number of moves: " ++ show moves)
   putStrLn ("current player: " ++ [symbolToChar (Just symbol)])
   printBoard board
-  if gameOver board then
-    (putStrLn "Game Over")
-  else do
-    input <- getLine
-    case parsePosition input of
-      Right position -> do
-        case playMove board (Move symbol position) of
-          Right board' -> gameLoop (updateGameState board' gameState)
-          Left playError -> do
-            putStrLn (show playError)
-            gameLoop gameState
-      Left parseError -> do
-        putStrLn parseError
-        gameLoop gameState
+  case gameOver board of
+    Left (Just s) -> do
+      putStrLn ("Game Over, " ++ [symbolToChar (Just s)] ++ " wins!")
+    Left Nothing -> do
+      putStrLn "Game Over, it's a draw!"
+    Right () -> do
+      input <- getLine
+      case parsePosition input of
+        Right position -> do
+          case playMove board (Move symbol position) of
+            Right board' -> gameLoop (updateGameState board' gameState)
+            Left playError -> do
+              putStrLn (show playError)
+              gameLoop gameState
+        Left parseError -> do
+          putStrLn parseError
+          gameLoop gameState
 
 parsePosition :: String -> Either String Position
 parsePosition input = check (words input) where

@@ -38,7 +38,8 @@ testGameOver :: Spec
 testGameOver = do
   describe "gameOver" $ do
     prop "detects when the game is over" $
-      \(GameOver board) -> board `shouldSatisfy` gameOver
+      \(GameOver board) -> board `shouldSatisfy` (isLeft . gameOver)
+    -- TODO: Validate the actual result (who won? draw?)
 
 data ValidMove = ValidMove Move Int deriving Show
 
