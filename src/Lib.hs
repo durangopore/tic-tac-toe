@@ -1,7 +1,7 @@
 module Lib
     ( module TicTacToe,
-      module GameState
+      module GameState,
     ) where
 
-import TicTacToe
 import GameState
+import TicTacToe

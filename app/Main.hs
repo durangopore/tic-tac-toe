@@ -2,6 +2,7 @@ module Main (main) where
 
 import Control.Exception (try)
 import Data.Either.Combinators (mapLeft)
+import Data.Type.Nat (SNatI)
 import System.Environment (getArgs)
 import System.IO.Error (isEOFError)
 import Text.Read (readEither)
@@ -11,19 +12,17 @@ import Lib
 main :: IO ()
 main = do
   args <- getArgs
-  case parseArgs args of
+  case parseArgs args >>= parseSize of
     Right size -> do
-      case newBoard size of
-        Right board -> do
-          result <- selectionLoop
-          case result of
-            Left e -> putStrLn (if isEOFError e then "quit!" else ("there was an error: " ++ show e))
-            Right symbol -> do
-              gameResult <- gameLoop (initGameState board symbol)
-              case gameResult of
-                Left e -> putStrLn (if isEOFError e then "quit!" else ("there was an error: " ++ show e))
-                _ -> return ()
-        Left e -> putStrLn (show e)
+      reify size $ \p -> do
+        result <- selectionLoop
+        case result of
+          Left e -> putStrLn (if isEOFError e then "quit!" else ("there was an error: " ++ show e))
+          Right symbol -> do
+            gameResult <- gameLoop (initGameState (newBoard p) symbol)
+            case gameResult of
+              Left e -> putStrLn (if isEOFError e then "quit!" else ("there was an error: " ++ show e))
+              Right () -> return ()
     Left e -> putStrLn e
 
 selectionLoop :: IO (Either IOError Symbol)
@@ -45,7 +44,7 @@ safeGetLine f = do
     Left e -> return (Left e)
     Right input -> f input
 
-gameLoop :: GameState -> IO (Either IOError ())
+gameLoop :: SNatI n => GameState n -> IO (Either IOError ())
 gameLoop gameState = do
   let board = currentBoard gameState
   let symbol = currentSymbol gameState

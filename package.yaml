@@ -37,6 +37,8 @@ library:
   source-dirs: src
   dependencies:
     - QuickCheck
+    - vec
+    - fin
 
 executables:
   tic-tac-toe-exe:
@@ -49,6 +51,7 @@ executables:
     dependencies:
     - tic-tac-toe
     - either
+    - fin
 
 tests:
   tic-tac-toe-test:
@@ -62,3 +65,5 @@ tests:
     - tic-tac-toe
     - hspec
     - QuickCheck
+    - fin
+    - vec
