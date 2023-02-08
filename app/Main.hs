@@ -1,7 +1,9 @@
 module Main (main) where
 
+import Control.Exception (try)
 import Data.Either.Combinators (mapLeft)
 import System.Environment (getArgs)
+import System.IO.Error (isEOFError)
 import Text.Read (readEither)
 
 import Lib
@@ -13,22 +15,37 @@ main = do
     Right size -> do
       case newBoard size of
         Right board -> do
-          symbol <- selectionLoop
-          gameLoop (initGameState board symbol)
+          result <- selectionLoop
+          case result of
+            Left e -> putStrLn (if isEOFError e then "quit!" else ("there was an error: " ++ show e))
+            Right symbol -> do
+              gameResult <- gameLoop (initGameState board symbol)
+              case gameResult of
+                Left e -> putStrLn (if isEOFError e then "quit!" else ("there was an error: " ++ show e))
+                _ -> return ()
         Left e -> putStrLn (show e)
     Left e -> putStrLn e
 
-selectionLoop :: IO Symbol
+selectionLoop :: IO (Either IOError Symbol)
 selectionLoop = do
   putStrLn "Select Player 1 symbol (x or o):"
-  input <- getLine
-  case parseSymbol input of
-    Right symbol -> return symbol
-    Left e       -> do
-      putStrLn e
-      selectionLoop
+  result <- try getLine
+  case result of
+    Left e -> return (Left e)
+    Right input -> case parseSymbol input of
+      Right symbol -> return (Right symbol)
+      Left e       -> do
+        putStrLn e
+        selectionLoop
 
-gameLoop :: GameState -> IO ()
+safeGetLine :: (String -> IO (Either IOError a)) -> IO (Either IOError a)
+safeGetLine f = do
+  result <- try getLine
+  case result of
+    Left e -> return (Left e)
+    Right input -> f input
+
+gameLoop :: GameState -> IO (Either IOError ())
 gameLoop gameState = do
   let board = currentBoard gameState
   let symbol = currentSymbol gameState
@@ -39,11 +56,12 @@ gameLoop gameState = do
   case gameOver board of
     Left (Just s) -> do
       putStrLn ("Game Over, " ++ [symbolToChar s] ++ " wins!")
+      return (Right ())
     Left Nothing -> do
       putStrLn "Game Over, it's a draw!"
+      return (Right ())
     Right () -> do
-      input <- getLine
-      case parsePosition input of
+      safeGetLine (\input -> case parsePosition input of
         Right position -> do
           case playMove board (Move symbol position) of
             Right board' -> gameLoop (updateGameState board' gameState)
@@ -52,7 +70,7 @@ gameLoop gameState = do
               gameLoop gameState
         Left parseError -> do
           putStrLn parseError
-          gameLoop gameState
+          gameLoop gameState)
 
 parsePosition :: String -> Either String Position
 parsePosition input = check (words input) where
