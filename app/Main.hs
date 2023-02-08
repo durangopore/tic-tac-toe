@@ -61,16 +61,17 @@ gameLoop gameState = do
       putStrLn "Game Over, it's a draw!"
       return (Right ())
     Right () -> do
-      safeGetLine (\input -> case parsePosition input of
-        Right position -> do
-          case playMove board (Move symbol position) of
-            Right board' -> gameLoop (updateGameState board' gameState)
-            Left playError -> do
-              putStrLn (show playError)
-              gameLoop gameState
-        Left parseError -> do
-          putStrLn parseError
-          gameLoop gameState)
+      safeGetLine $ \input -> do
+        case parsePosition input of
+          Right position -> do
+            case playMove board (Move symbol position) of
+              Right board' -> gameLoop (updateGameState board' gameState)
+              Left playError -> do
+                putStrLn (show playError)
+                gameLoop gameState
+          Left parseError -> do
+            putStrLn parseError
+            gameLoop gameState
 
 parsePosition :: String -> Either String Position
 parsePosition input = check (words input) where
