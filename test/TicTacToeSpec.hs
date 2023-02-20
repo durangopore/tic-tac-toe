@@ -13,10 +13,20 @@ import TicTacToe.Internal
 
 spec :: Spec
 spec = do
+  testNewBoard
   testPlayMove
   testGameOver
   testParseSymbol
   testOtherSymbol
+
+testNewBoard :: Spec
+testNewBoard = do
+  describe "newBoard" $ do
+    prop "handles any size correctly" $
+      \size -> if size < 2 then
+                 newBoard size `shouldSatisfy` isLeft
+               else
+                 newBoard size `shouldSatisfy` (hasSize size . fromRight undefined)
 
 testPlayMove :: Spec
 testPlayMove = do
