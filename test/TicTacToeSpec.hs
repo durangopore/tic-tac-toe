@@ -15,6 +15,7 @@ spec :: Spec
 spec = do
   testPlayMove
   testGameOver
+  testParseSymbol
 
 testPlayMove :: Spec
 testPlayMove = do
@@ -40,6 +41,14 @@ testGameOver = do
     prop "detects when the game is over" $
       \(GameOver board) -> board `shouldSatisfy` (isLeft . gameOver)
     -- TODO: Validate the actual result (who won? draw?)
+
+testParseSymbol :: Spec
+testParseSymbol = do
+  describe "parseSymbol" $ do
+    prop "round trip works" $
+      \(AnySymbol symbol) -> parseSymbol [symbolToChar symbol] == Right symbol
+    it "fails to parse garbage" $
+      parseSymbol "some random text" `shouldSatisfy` isLeft
 
 data ValidMove = ValidMove Move Int deriving Show
 
