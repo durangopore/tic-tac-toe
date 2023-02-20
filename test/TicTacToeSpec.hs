@@ -30,11 +30,13 @@ testPlayMove = do
     prop "preserves size after a move is played" $
       \(ValidMove move size) -> playMove' (newBoard' size) move
                                 `shouldSatisfy`
-                                \board -> case board of
-                                            (Board rs) -> length rs == size && all ((== size) . length) rs
+                                hasSize size
   where
     newBoard' = fromRight undefined . newBoard
     playMove' b p = fromRight undefined $ playMove b p
+
+hasSize :: Int -> Board -> Bool
+hasSize size (Board rs) = length rs == size && all ((== size) . length) rs
 
 testGameOver :: Spec
 testGameOver = do
