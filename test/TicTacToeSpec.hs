@@ -16,6 +16,7 @@ spec = do
   testPlayMove
   testGameOver
   testParseSymbol
+  testOtherSymbol
 
 testPlayMove :: Spec
 testPlayMove = do
@@ -49,6 +50,14 @@ testParseSymbol = do
       \(AnySymbol symbol) -> parseSymbol [symbolToChar symbol] == Right symbol
     it "fails to parse garbage" $
       parseSymbol "some random text" `shouldSatisfy` isLeft
+
+testOtherSymbol :: Spec
+testOtherSymbol = do
+  describe "otherSymbol" $ do
+    prop "round trip works" $
+      \(AnySymbol symbol) -> symbol == otherSymbol (otherSymbol symbol)
+    prop "toggle works" $
+      \(AnySymbol symbol) -> symbol /= otherSymbol symbol
 
 data ValidMove = ValidMove Move Int deriving Show
 
