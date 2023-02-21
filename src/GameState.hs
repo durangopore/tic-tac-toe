@@ -1,3 +1,6 @@
+{-# LANGUAGE DataKinds                    #-}
+{-# LANGUAGE KindSignatures               #-}
+
 module GameState (
   GameState,
   initGameState,
@@ -7,21 +10,23 @@ module GameState (
   numMoves
 ) where
 
+import Data.Nat (Nat (..))
+
 import TicTacToe
 
-data GameState = GameState Board Symbol Int
+data GameState (n :: Nat) = GameState (Board n) Symbol Int
 
-initGameState :: Board -> Symbol -> GameState
+initGameState :: Board n -> Symbol -> GameState n
 initGameState board symbol = GameState board symbol 0
 
-updateGameState :: Board -> GameState -> GameState
+updateGameState :: Board n -> GameState n -> GameState n
 updateGameState board (GameState _ symbol moves) = GameState board (otherSymbol symbol) (moves + 1)
 
-currentSymbol :: GameState -> Symbol
+currentSymbol :: GameState n -> Symbol
 currentSymbol (GameState _ symbol _) = symbol
 
-currentBoard :: GameState -> Board
+currentBoard :: GameState n -> Board n
 currentBoard (GameState board _ _) = board
 
-numMoves :: GameState -> Int
+numMoves :: GameState n -> Int
 numMoves (GameState _ _ moves) = moves

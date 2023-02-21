@@ -1,8 +1,14 @@
+{-# LANGUAGE DataKinds                    #-}
+{-# LANGUAGE KindSignatures               #-}
+
 module TicTacToeSpec (
   spec
 ) where
 
 import Data.Either
+import Data.Maybe (fromJust)
+import Data.Nat (Nat (..))
+import Data.Vec.Lazy (fromList)
 
 import Test.Hspec
 import Test.Hspec.QuickCheck
@@ -13,40 +19,22 @@ import TicTacToe.Internal
 
 spec :: Spec
 spec = do
-  testNewBoard
   testPlayMove
   testGameOver
   testParseSymbol
   testOtherSymbol
 
-testNewBoard :: Spec
-testNewBoard = do
-  describe "newBoard" $ do
-    prop "handles any size correctly" $
-      \size -> if size < 2 then
-                 newBoard size `shouldSatisfy` isLeft
-               else
-                 newBoard size `shouldSatisfy` (hasSize size . fromRight undefined)
-
 testPlayMove :: Spec
 testPlayMove = do
   describe "playMove" $ do
     prop "sets an arbitrary cell on an empty board if in range" $
-      \(ValidMove move size) -> let isSet s p b = getCell b p == Just (Just s) in
-                                  playMove' (newBoard' size) move
-                                  `shouldSatisfy`
-                                  case move of
-                                    (Move s p) -> isSet s p
-    prop "preserves size after a move is played" $
-      \(ValidMove move size) -> playMove' (newBoard' size) move
-                                `shouldSatisfy`
-                                hasSize size
+      \(ValidMove move size) -> reify size $ \p -> let isSet s p b = getCell b p == Just (Just s) in
+                                                     playMove' (newBoard p) move
+                                                     `shouldSatisfy`
+                                                     case move of
+                                                       (Move s p) -> isSet s p
   where
-    newBoard' = fromRight undefined . newBoard
     playMove' b p = fromRight undefined $ playMove b p
-
-hasSize :: Int -> Board -> Bool
-hasSize size (Board rs) = length rs == size && all ((== size) . length) rs
 
 testGameOver :: Spec
 testGameOver = do
@@ -71,7 +59,7 @@ testOtherSymbol = do
     prop "toggle works" $
       \(AnySymbol symbol) -> symbol /= otherSymbol symbol
 
-data ValidMove = ValidMove Move Int deriving Show
+data ValidMove = ValidMove Move Size deriving Show
 
 instance Arbitrary ValidMove where
   arbitrary = do
@@ -85,42 +73,44 @@ instance Arbitrary AnySymbol where
   arbitrary = do
     elements $ map AnySymbol [Cross, Nought]
 
-data ValidPosition = ValidPosition Position Int deriving Show
+data ValidPosition = ValidPosition Position Size deriving Show
 
 instance Arbitrary ValidPosition where
   arbitrary = do
     size <- arbitrary `suchThat` (> 2)
     row <- chooseInt (0, size - 1)
     col <- chooseInt (0, size - 1)
-    return (ValidPosition (Position row col) size)
+    return (ValidPosition (Position row col) (Size size))
 
-newtype GameOver = GameOver Board deriving Show
+data GameOver (n :: Nat) = GameOver (Board n) deriving Show
 
-instance Arbitrary GameOver where
+instance Arbitrary (GameOver n) where
   arbitrary = do
-    ValidPosition (Position rowIndex colIndex) size <- arbitrary
-    Board board <- randomBoard size
-    AnySymbol symbol <- arbitrary
-
-    let rowBoard = setElem (replicate size (Just symbol)) rowIndex board
-    let colBoard = setCol symbol colIndex board
-    let leftDiagBoard = setLeftDiag symbol board
-    let rightDiagBoard = setRightDiag symbol size board
-    Board staleMate <- fullBoard size
-    selectedBoard <- elements [staleMate, rowBoard, colBoard, leftDiagBoard, rightDiagBoard]
-    return (GameOver (Board selectedBoard))
+    ValidPosition (Position rowIndex colIndex) (Size size) <- arbitrary
+    reify (Size size) $ \p -> do
+      board <- randomBoard size
+      AnySymbol symbol <- arbitrary
+      let rowBoard = setElemList (replicate size (Just symbol)) rowIndex board
+          colBoard = setCol symbol colIndex board
+          leftDiagBoard = setLeftDiag symbol board
+          rightDiagBoard = setRightDiag symbol size board
+      staleMate <- fullBoard size
+      selectedBoard <- elements [staleMate, rowBoard, colBoard, leftDiagBoard, rightDiagBoard]
+      return (GameOver (toBoard p selectedBoard))
 
     where
-      setCol symbol colIndex  = fmap (setElem (Just symbol) colIndex)
+      setCol symbol colIndex  = fmap (setElemList (Just symbol) colIndex)
       setLeftDiag symbol = fmap f . zip [0..]
         where
-          f (i, r) = setElem (Just symbol) i r
+          f (i, r) = setElemList (Just symbol) i r
       setRightDiag symbol size = fmap f . zip [size-1..1]
         where
-          f (i, r) = setElem (Just symbol) i r
+          f (i, r) = setElemList (Just symbol) i r
       randomBoard size = do
-        board <- vectorOf size . vectorOf size . elements $ [Nothing, Just Nought, Just Cross]
-        return (Board (board))
+        vectorOf size . vectorOf size . elements $ [Nothing, Just Nought, Just Cross]
       fullBoard size = do
-        board <- vectorOf size . vectorOf size . elements $ [Just Nought, Just Cross]
-        return (Board (board))
+        vectorOf size . vectorOf size . elements $ [Just Nought, Just Cross]
+      toBoard :: proxy n -> [[Maybe Symbol]] -> Board n
+      toBoard _ = Board . fromJust . fromList . fmap (fromJust . fromList)
+      setElemList a i as = take i as ++ (a : (drop (i + 1) as))
+
