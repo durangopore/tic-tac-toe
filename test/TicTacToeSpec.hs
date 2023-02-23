@@ -89,7 +89,7 @@ data InRangePosition = InRangePosition Position Int deriving Show
 
 instance Arbitrary InRangePosition where
   arbitrary = do
-    size <- arbitrary `suchThat` (> 2)
+    size <- arbitrary `suchThat` (>= 2)
     row <- chooseInt (0, size - 1)
     col <- chooseInt (0, size - 1)
     return (InRangePosition (Position row col) size)
