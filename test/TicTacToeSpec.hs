@@ -15,7 +15,7 @@ spec :: Spec
 spec = do
   testNewBoard
   testPlayMove
-  testGameOver
+  testGameStatus
   testParseSymbol
   testOtherSymbol
 
@@ -48,11 +48,11 @@ testPlayMove = do
 hasSize :: Int -> Board -> Bool
 hasSize size (Board rs) = length rs == size && all ((== size) . length) rs
 
-testGameOver :: Spec
-testGameOver = do
-  describe "gameOver" $ do
+testGameStatus :: Spec
+testGameStatus = do
+  describe "gameStatus" $ do
     prop "detects when the game is over" $
-      \(GameOver board) -> board `shouldSatisfy` (isLeft . gameOver)
+      \(GameOver board) -> gameStatus board `shouldNotBe` Ongoing
     -- TODO: Validate the actual result (who won? draw?)
 
 testParseSymbol :: Spec

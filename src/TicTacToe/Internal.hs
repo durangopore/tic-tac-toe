@@ -53,8 +53,15 @@ printBoard (Board rs) = do
   where
     printRow (i, row) = (intersperse ' ' $ map (maybe '_' symbolToChar) row) ++ " " ++ show i
 
-gameOver :: Board -> Either (Maybe Symbol) ()
-gameOver b@(Board rs) = foldAllSame (rows b) *>
+data GameStatus = Win Symbol | Draw | Ongoing deriving (Eq, Show)
+
+toGameStatus :: Either (Maybe Symbol) () -> GameStatus
+toGameStatus (Left (Just s)) = Win s
+toGameStatus (Left Nothing) = Draw
+toGameStatus (Right ()) = Ongoing
+
+gameStatus :: Board -> GameStatus
+gameStatus b@(Board rs) = toGameStatus $ foldAllSame (rows b) *>
                         foldAllSame (cols b) *>
                         allSame (leftDiag b) *>
                         allSame (rightDiag b) *>

@@ -53,14 +53,14 @@ gameLoop gameState = do
   putStrLn ("number of moves: " ++ show moves)
   putStrLn ("current player: " ++ [symbolToChar symbol])
   printBoard board
-  case gameOver board of
-    Left (Just s) -> do
+  case gameStatus board of
+    Win s -> do
       putStrLn ("Game Over, " ++ [symbolToChar s] ++ " wins!")
       return (Right ())
-    Left Nothing -> do
+    Draw -> do
       putStrLn "Game Over, it's a draw!"
       return (Right ())
-    Right () -> do
+    Ongoing -> do
       safeGetLine $ \input -> do
         case parsePosition input of
           Right position -> do
