@@ -120,7 +120,7 @@ instance Arbitrary GameOver where
           f (i, r) = setElem (Just symbol) i r
       randomBoard size = do
         board <- vectorOf size . vectorOf size . elements $ [Nothing, Just Nought, Just Cross]
-        return (Board (board))
+        return (Board board)
       fullBoard size = do
         board <- vectorOf size . vectorOf size . elements $ [Just Nought, Just Cross]
-        return (Board (board))
+        return (Board board)
