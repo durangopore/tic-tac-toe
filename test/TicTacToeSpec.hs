@@ -75,7 +75,7 @@ data InRangeMove = InRangeMove Move Int deriving Show
 
 instance Arbitrary InRangeMove where
   arbitrary = do
-    ValidPosition position size <- arbitrary
+    InRangePosition position size <- arbitrary
     AnySymbol symbol <- arbitrary
     return (InRangeMove (Move symbol position) size)
 
@@ -85,20 +85,20 @@ instance Arbitrary AnySymbol where
   arbitrary = do
     elements $ map AnySymbol [Cross, Nought]
 
-data ValidPosition = ValidPosition Position Int deriving Show
+data InRangePosition = InRangePosition Position Int deriving Show
 
-instance Arbitrary ValidPosition where
+instance Arbitrary InRangePosition where
   arbitrary = do
     size <- arbitrary `suchThat` (> 2)
     row <- chooseInt (0, size - 1)
     col <- chooseInt (0, size - 1)
-    return (ValidPosition (Position row col) size)
+    return (InRangePosition (Position row col) size)
 
 newtype GameOver = GameOver Board deriving Show
 
 instance Arbitrary GameOver where
   arbitrary = do
-    ValidPosition (Position rowIndex colIndex) size <- arbitrary
+    InRangePosition (Position rowIndex colIndex) size <- arbitrary
     Board board <- randomBoard size
     AnySymbol symbol <- arbitrary
 
