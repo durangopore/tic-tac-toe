@@ -115,7 +115,7 @@ instance Arbitrary GameOver where
       setLeftDiag symbol = fmap f . zip [0..]
         where
           f (i, r) = setElem (Just symbol) i r
-      setRightDiag symbol size = fmap f . zip [size-1..1]
+      setRightDiag symbol size = fmap f . zip [size-1,size-2..0]
         where
           f (i, r) = setElem (Just symbol) i r
       randomBoard size = do
