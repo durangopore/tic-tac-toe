@@ -32,13 +32,13 @@ testPlayMove :: Spec
 testPlayMove = do
   describe "playMove" $ do
     prop "sets an arbitrary cell on an empty board if in range" $
-      \(ValidMove move size) -> let isSet s p b = getCell b p == Just (Just s) in
+      \(InRangeMove move size) -> let isSet s p b = getCell b p == Just (Just s) in
                                   playMove' (newBoard' size) move
                                   `shouldSatisfy`
                                   case move of
                                     (Move s p) -> isSet s p
-    prop "preserves size after a move is played" $
-      \(ValidMove move size) -> playMove' (newBoard' size) move
+    prop "preserves size after a move is played on an empty board" $
+      \(InRangeMove move size) -> playMove' (newBoard' size) move
                                 `shouldSatisfy`
                                 hasSize size
   where
@@ -71,13 +71,13 @@ testOtherSymbol = do
     prop "toggle works" $
       \(AnySymbol symbol) -> symbol /= otherSymbol symbol
 
-data ValidMove = ValidMove Move Int deriving Show
+data InRangeMove = InRangeMove Move Int deriving Show
 
-instance Arbitrary ValidMove where
+instance Arbitrary InRangeMove where
   arbitrary = do
     ValidPosition position size <- arbitrary
     AnySymbol symbol <- arbitrary
-    return (ValidMove (Move symbol position) size)
+    return (InRangeMove (Move symbol position) size)
 
 newtype AnySymbol = AnySymbol Symbol deriving Show
 
