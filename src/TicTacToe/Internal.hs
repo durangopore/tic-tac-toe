@@ -54,14 +54,14 @@ printBoard (Board rs) = do
     printRow (i, row) = (intersperse ' ' $ map (maybe '_' symbolToChar) row) ++ " " ++ show i
 
 gameOver :: Board -> Either (Maybe Symbol) ()
-gameOver b@(Board rs) = foldAllSame (rows b) >>
-                        foldAllSame (cols b) >>
-                        allSame (leftDiag b) >>
-                        allSame (rightDiag b) >>
+gameOver b@(Board rs) = foldAllSame (rows b) *>
+                        foldAllSame (cols b) *>
+                        allSame (leftDiag b) *>
+                        allSame (rightDiag b) *>
                         if all (all isJust) rs then Left Nothing else Right ()
 
 foldAllSame :: Eq a => [[Maybe a]] -> Either (Maybe a) ()
-foldAllSame = foldr (\x y -> allSame x >> y) (Right ())
+foldAllSame = foldr (\x y -> allSame x *> y) (Right ())
 
 allSame :: Eq a => [Maybe a] -> Either (Maybe a) ()
 allSame [] = Left Nothing
